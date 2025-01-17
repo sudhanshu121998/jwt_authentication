@@ -17,11 +17,11 @@ import (
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "cluste0", "user")
 var validate = validator.New()
 
-func LoginUser() {
+func LoginUser(c *gin.Context) {
 
 }
 
-func RegisterUser() {
+func RegisterUser(c *gin.Context) {
 
 }
 
@@ -33,29 +33,28 @@ func VerifyPassword() {
 
 }
 
-func GetUsers() {
-
+func GetUsers(c *gin.Context) {
+	c.JSON(http.StatusOK, "USERDATA")
 }
 
-func GetUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userId := c.Param("user_id")
+func GetUser(c *gin.Context) {
+	userId := c.Param("user_id")
 
-		if err := helpers.MatchUserTypeToUid(c, userId); err != nil {
-			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
-			return
-		}
-
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-
-		var user models.User
-
-		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
-		defer cancel()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, user)
+	if err := helpers.MatchUserTypeToUid(c, userId); err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
 	}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	var user models.User
+
+	err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
+	defer cancel()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+	return
 }
