@@ -30,5 +30,5 @@ func Authenticate(c *gin.Context) {
 	c.Set("uid", claims.Uid)
 	c.Set("user_type", claims.UserType)
 	c.Next()
-	return
+	
 }
